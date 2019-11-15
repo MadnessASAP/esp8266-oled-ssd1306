@@ -56,7 +56,26 @@ public:
 private:
 	const char *_str;
 };
+#elif defined IDF_VER
+#include <cstdlib>
+#include <cstring>  // For memset, strlen, etc...
+#include <string>   // Going to need that std::string class
+#include "freertos/task.h"
 
+#define pgm_read_byte(addr)   (*(const unsigned char *)(addr))
+#define yield() taskYIELD()
+
+using namespace std;
+/*
+ * Arduino String are almost identical to std::string except 
+ * for the toCharArray which is identical to the copy function.
+ */
+class String : public string {
+  public:
+  void toCharArray(char *buf, size_t bufsize, size_t index = 0) const {
+    copy(buf, bufsize, index);
+  }
+};
 #else
 #error "Unkown operating system"
 #endif
@@ -149,6 +168,8 @@ char DefaultFontTableLookup(const uint8_t ch);
 class OLEDDisplay : public Print  {
 #elif __MBED__
 class OLEDDisplay : public Stream {
+#elif defined IDF_VER
+class OLEDDisplay {
 #else
 #error "Unkown operating system"
 #endif
