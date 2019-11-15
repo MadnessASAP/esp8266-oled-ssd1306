@@ -6,7 +6,7 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/ThingPulse/esp8266-oled-ssd1306"
+    "url": "https://github.com/MadnessASAP/esp8266-oled-ssd1306"
   },
   "authors":
   [
@@ -18,9 +18,13 @@
     {
         "name": "Fabrice Weinberg",
         "email": "fabrice@weinberg.me"
+    },
+    {
+        "name": "Michael Weinrich",
+        "email": "michael@a5ap.net"
     }
   ],
-  "frameworks": "arduino",
+  "frameworks": "arduino,espidf",
   "platforms": [
     "espressif8266",
     "espressif32"
