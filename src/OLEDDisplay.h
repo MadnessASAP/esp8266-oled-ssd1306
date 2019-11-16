@@ -60,9 +60,11 @@ private:
 #include <cstdlib>
 #include <cstring>  // For memset, strlen, etc...
 #include <string>   // Going to need that std::string class
+#include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 #define pgm_read_byte(addr)   (*(const unsigned char *)(addr))
+#define delay(x) vTaskDelay(x / portTICK_PERIOD_MS)
 #define yield() taskYIELD()
 
 using namespace std;
@@ -72,6 +74,7 @@ using namespace std;
  */
 class String : public string {
   public:
+  using string::string;
   void toCharArray(char *buf, size_t bufsize, size_t index = 0) const {
     copy(buf, bufsize, index);
   }
