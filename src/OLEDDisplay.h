@@ -57,28 +57,29 @@ private:
 	const char *_str;
 };
 #elif defined IDF_VER
-#include <stdlib.h>
-#include <string.h> // For memset, strlen, etc...
-#include "freertos/task.h"
+#include <cstdlib>
+#include <cstring>  // For memset, strlen, etc...
+#include <string>   // Going to need that std::string class
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"  // for delay and yield functions
 
 #define pgm_read_byte(addr)   (*(const unsigned char *)(addr))
+#define delay(x) vTaskDelay(x / portTICK_PERIOD_MS)
 #define yield() taskYIELD()
 
 using namespace std;
 /*
- * This is a little Arduino String emulation to keep the OLEDDisplay
- * library code in common between Arduino and mbed-os
+ * Arduino String library and C++ std::string are close to enough
+ * to be of practically no difference
  */
-class String {
-public:
-	String(const char *s) { _str = s; };
-	int length() { return strlen(_str); };
-	const char *c_str() { return _str; };
-    void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
-		memcpy(buf, _str + index,  min(bufsize, strlen(_str)));
-	};
-private:
-	const char *_str;
+class String : public string {
+  public:
+  using string::string;   // C++11 feature, pull all of std::string constructors
+
+  // Alias string::copy to Arduinos toCharArray
+  void toCharArray(char *buf, size_t bufsize, size_t index = 0) const {
+    copy(buf, bufsize, index);
+  }
 };
 #else
 #error "Unkown operating system"
