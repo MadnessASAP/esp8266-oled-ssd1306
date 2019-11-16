@@ -36,6 +36,9 @@
 #include <Arduino.h>
 #elif __MBED__
 #include <mbed.h>
+#elif defined IDF_VER
+#include <cmath>
+#include "esp_timer.h"
 #else
 #error "Unkown operating system"
 #endif

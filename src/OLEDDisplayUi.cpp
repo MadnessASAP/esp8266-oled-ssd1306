@@ -233,6 +233,8 @@ int16_t OLEDDisplayUi::update(){
 	Timer t;
 	t.start();
 	unsigned long frameStart = t.read_ms();
+#elif defined IDF_VER
+  unsigned long frameStart = esp_timer_get_time() / 1000;
 #else
 #error "Unkown operating system"
 #endif
@@ -248,6 +250,8 @@ int16_t OLEDDisplayUi::update(){
   return this->updateInterval - (millis() - frameStart);
 #elif __MBED__
   return this->updateInterval - (t.read_ms() - frameStart);
+#elif defined IDF_VER
+  return this->updateInterval - (esp_timer_get_time() / 1000 - frameStart);
 #else
 #error "Unkown operating system"
 #endif
