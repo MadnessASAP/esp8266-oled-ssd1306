@@ -58,7 +58,7 @@ class SSD1306IDF : public OLEDDisplay {
       i2c_config.scl_io_num = _scl;
       i2c_config.master.clk_speed = 400e3;  // 400 kHz
       if(i2c_param_config(_port, &i2c_config) != ESP_OK) return false;
-      if(i2c_driver_install(_port, I2C_MODE_MASTER, NULL, NULL, 0) != ESP_OK) return false;
+      if(i2c_driver_install(_port, I2C_MODE_MASTER, 0, 0, 0) != ESP_OK) return false;
       
       return true;
     }
