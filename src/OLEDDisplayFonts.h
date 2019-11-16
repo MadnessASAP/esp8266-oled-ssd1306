@@ -1,7 +1,7 @@
 #ifndef OLEDDISPLAYFONTS_h
 #define OLEDDISPLAYFONTS_h
 
-#ifdef __MBED__
+#ifndef ARDUINO
 #define PROGMEM
 #endif
 
