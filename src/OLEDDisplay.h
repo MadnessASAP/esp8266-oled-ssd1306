@@ -57,9 +57,8 @@ private:
 	const char *_str;
 };
 #elif defined IDF_VER
-#include <cstdlib>
-#include <cstring>  // For memset, strlen, etc...
-#include <string>   // Going to need that std::string class
+#include <stdlib.h>
+#include <string.h> // For memset, strlen, etc...
 #include "freertos/task.h"
 
 #define pgm_read_byte(addr)   (*(const unsigned char *)(addr))
@@ -67,14 +66,19 @@ private:
 
 using namespace std;
 /*
- * Arduino String are almost identical to std::string except 
- * for the toCharArray which is identical to the copy function.
+ * This is a little Arduino String emulation to keep the OLEDDisplay
+ * library code in common between Arduino and mbed-os
  */
-class String : public string {
-  public:
-  void toCharArray(char *buf, size_t bufsize, size_t index = 0) const {
-    copy(buf, bufsize, index);
-  }
+class String {
+public:
+	String(const char *s) { _str = s; };
+	int length() { return strlen(_str); };
+	const char *c_str() { return _str; };
+    void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
+		memcpy(buf, _str + index,  min(bufsize, strlen(_str)));
+	};
+private:
+	const char *_str;
 };
 #else
 #error "Unkown operating system"
