@@ -32,17 +32,21 @@
 #define SSD1306IDF_h
 #ifdef IDF_VER
 #include "driver/i2c.h"
-#include "sdkconfig"
+#include "sdkconfig.h"
 #include "OLEDDisplay.h"
 
 // TODO: Finish implementing Kconfig options
-#define _I2C_PORT I2C_NUM_##CONFIG
+#define __MACROCAT(A, B) A##B
+#define MACROCAT(A, B) __MACROCAT(A, B)
+#define _SSD1306_PORT MACROCAT(I2C_NUM_, CONFIG_SSD1306_I2C_PORT)
+#define _SSD1306_SDA MACROCAT(GPIO_NUM_, CONFIG_SSD1306_I2C_SDA)
+#define _SSD1306_SCL MACROCAT(GPIO_NUM_, CONFIG_SSD1306_I2C_SCL)
 #ifdef CONFIG_SSD1306_GEOMETRY_128_64
-  #define _OLED_GEOMETRY GEOMETRY_128_64
+  #define _SSD1306_OLED_GEOMETRY GEOMETRY_128_64
 #elif CONFIG_SSD1306_GEOMETRY_128_32
-  #define _OLED_GEOMETRY GEOMETRY_128_32
+  #define _SSD1306_OLED_GEOMETRY GEOMETRY_128_32
 #else
-  #define _OLED_GEOMETRY GEOMETRY_128_64
+  #define _SSD1306_OLED_GEOMETRY GEOMETRY_128_64
 #endif
 
 class SSD1306IDF : public OLEDDisplay {
@@ -53,7 +57,7 @@ class SSD1306IDF : public OLEDDisplay {
     i2c_port_t          _port;
 
   public:
-    SSD1306IDF(uint8_t _address, gpio_num_t _sda, gpio_num_t _scl
+    SSD1306IDF(uint8_t _address, gpio_num_t _sda, gpio_num_t _scl,
       OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64, i2c_port_t _port = I2C_NUM_0) {
       setGeometry(g);
 
