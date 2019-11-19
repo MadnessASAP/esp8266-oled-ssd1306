@@ -31,8 +31,19 @@
 #ifndef SSD1306IDF_h
 #define SSD1306IDF_h
 #ifdef IDF_VER
-#include "OLEDDisplay.h"
 #include "driver/i2c.h"
+#include "sdkconfig"
+#include "OLEDDisplay.h"
+
+// TODO: Finish implementing Kconfig options
+#define _I2C_PORT I2C_NUM_##CONFIG
+#ifdef CONFIG_SSD1306_GEOMETRY_128_64
+  #define _OLED_GEOMETRY GEOMETRY_128_64
+#elif CONFIG_SSD1306_GEOMETRY_128_32
+  #define _OLED_GEOMETRY GEOMETRY_128_32
+#else
+  #define _OLED_GEOMETRY GEOMETRY_128_64
+#endif
 
 class SSD1306IDF : public OLEDDisplay {
   private:
@@ -42,7 +53,8 @@ class SSD1306IDF : public OLEDDisplay {
     i2c_port_t          _port;
 
   public:
-    SSD1306IDF(uint8_t _address, gpio_num_t _sda, gpio_num_t _scl, OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64, i2c_port_t _port = I2C_NUM_0) {
+    SSD1306IDF(uint8_t _address, gpio_num_t _sda, gpio_num_t _scl
+      OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64, i2c_port_t _port = I2C_NUM_0) {
       setGeometry(g);
 
       this->_address = _address;

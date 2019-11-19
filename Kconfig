@@ -1,9 +1,40 @@
 menu "SSD1306 Driver"
-    choice SSD1306_I2C_PORT
-        prompt "I2C Port"
-        config SSD1306_I2C_PORT_0
-        bool "I2C Port 0"
-        config SSD1306_I2C_PORT_1
-        bool "I2C Port 1"
+    config SSD1306_I2C_PORT
+        int "I2C Port (0-1)"
+        range 0 1
+        default 0
+        help
+            Selects which I2C port will be used to drive the display.
+    config SSD1306_I2C_ADDRESS
+        hex "Display Address (0x00-0x7F)"
+        range 0x00 0x7F
+        default 0x3C
+        help
+            I2C Address of the SSD1306 chip
+    choice SSD1306_GEOMETRY
+        prompt "Geometry of the OLED Display"
+        config SSD1306_GEOMETRY_128_64
+            bool "128x64"
+        config SSD1306_GEOMETRY_128_32
+            bool "128x32"
     endchoice
+    config SSD1306_I2C_DO_INSTALL
+        bool "Install the I2C driver"
+        default y
+        help
+            Select if the I2C port driver is already configured and installed.  If deselected ensure that the I2C port selected is already setup before using this driver.
+    config SSD1306_I2C_SDA
+        int "SDA GPIO (0-48)"
+        range 0 48
+        default 4
+        depends on SSD1306_I2C_DO_INSTALL
+        help
+            GPIO the SSD1306 serial data line is connected too.
+    config SSD1306_I2C_SCL
+        int "SCL GPIO (0-48)"
+        range 0 48
+        default 15
+        depends on SSD1306_I2C_DO_INSTALL
+        help
+            GPIO the SSD1306 serial clock line is connected too.
 endmenu
