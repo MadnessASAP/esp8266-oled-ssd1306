@@ -1,0 +1,9 @@
+menu "SSD1306 Driver"
+    choice SSD1306_I2C_PORT
+        prompt "I2C Port"
+        config SSD1306_I2C_PORT_0
+        bool "I2C Port 0"
+        config SSD1306_I2C_PORT_1
+        bool "I2C Port 1"
+    endchoice
+endmenu
