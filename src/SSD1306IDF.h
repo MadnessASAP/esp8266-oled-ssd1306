@@ -32,6 +32,7 @@
 #define SSD1306IDF_h
 #ifdef IDF_VER
 #include "driver/i2c.h"
+#include "esp_log.h"
 #include "sdkconfig.h"
 #include "OLEDDisplay.h"
 
@@ -48,6 +49,8 @@
 #else
   #define _SSD1306_OLED_GEOMETRY GEOMETRY_128_64
 #endif
+
+static const char SSD1306TAG[] = "ssd1306";
 
 class SSD1306IDF : public OLEDDisplay {
   private:
@@ -73,8 +76,10 @@ class SSD1306IDF : public OLEDDisplay {
       i2c_config.sda_io_num = _sda;
       i2c_config.scl_io_num = _scl;
       i2c_config.master.clk_speed = 400e3;  // 400 kHz
-      if(i2c_param_config(_port, &i2c_config) != ESP_OK) return false;
-      if(i2c_driver_install(_port, I2C_MODE_MASTER, 0, 0, 0) != ESP_OK) return false;
+      ESP_LOGD(SSD1306TAG, "Installing I2C driver for port: %i, sda: %i, scl: %i, speed: %i kHz", 
+        _port, (int)_sda, (int)_scl, i2c_config.master.clk_speed / 1000); 
+      if(i2c_param_config(_port, &i2c_config) != ESP_OK) { ESP_LOGE(SSD1306TAG, "config failed"); return false; };
+      if(i2c_driver_install(_port, I2C_MODE_MASTER, 0, 0, 0) != ESP_OK) { ESP_LOGE(SSD1306TAG, "install failed"); return false; }
       
       return true;
     }
@@ -104,7 +109,8 @@ class SSD1306IDF : public OLEDDisplay {
         // If the minBoundY wasn't updated
         // we can savely assume that buffer_back[pos] == buffer[pos]
         // holdes true for all values of pos
-        if (minBoundY == UINT8_MAX) return;  
+        if (minBoundY == UINT8_MAX) { ESP_LOGV(SSD1306TAG, "nothing to draw"); return; }
+        ESP_LOGV(SSD1306TAG, "drawing (%i, %i) - (%i ,%i)", minBoundX, minBoundY, maxBoundX, maxBoundY);
         sendCommand(COLUMNADDR);
         sendCommand(minBoundX);
         sendCommand(maxBoundX);  
@@ -119,8 +125,10 @@ class SSD1306IDF : public OLEDDisplay {
             for(uint8_t y = minBoundY; y <= maxBoundY; y++)
               i2c_master_write(cmd, &buffer[minBoundX + y * width()], (maxBoundX - minBoundX) + 1 , true);
         i2c_master_stop(cmd);
-        i2c_master_cmd_begin(_port, cmd, 1000 / portTICK_RATE_MS);
+        ESP_LOGV(SSD1306TAG, "sending display update");
+        i2c_master_cmd_begin(_port, cmd, 1000 / portTICK_RATE_MS); 
         i2c_cmd_link_delete(cmd);
+        ESP_LOGV(SSD1306TAG, "done");
       #else // No double buffering
         sendCommand(COLUMNADDR);
         sendCommand(0x0);
@@ -149,6 +157,7 @@ class SSD1306IDF : public OLEDDisplay {
 		return 0;
 	}
     inline void sendCommand(uint8_t command) __attribute__((always_inline)){
+      ESP_LOGV(SSD1306TAG, "sending command %hhx", command);
       i2c_cmd_handle_t cmd = i2c_cmd_link_create();
         i2c_master_start(cmd);
           i2c_master_write_byte(cmd, (_address << 1), true); // b[0] == 0 (Write Mode)
