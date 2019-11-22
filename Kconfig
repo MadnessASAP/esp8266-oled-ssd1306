@@ -7,8 +7,8 @@ menu "SSD1306 Driver"
             Selects which I2C port will be used to drive the display.
     config SSD1306_I2C_ADDRESS
         hex "Display Address (0x00-0x7F)"
-        range 0x00 0x7F
-        default 0x3C
+        range 0 127
+        default 60
         help
             I2C Address of the SSD1306 chip
     choice SSD1306_GEOMETRY
