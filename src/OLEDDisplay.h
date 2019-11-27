@@ -68,19 +68,19 @@ private:
 #define yield() taskYIELD()
 
 using namespace std;
-/*
- * Arduino String library and C++ std::string are close to enough
- * to be of practically no difference
- */
-class String : public string {
-  public:
-  using string::string;   // C++11 feature, pull all of std::string constructors
-
-  // Alias string::copy to Arduinos toCharArray
-  void toCharArray(char *buf, size_t bufsize, size_t index = 0) const {
-    copy(buf, bufsize, index);
-  }
-};
+///*
+// * Arduino String library and C++ std::string are close to enough
+// * to be of practically no difference
+// */
+//class String : public string {
+//  public:
+//  using string::string;   // C++11 feature, pull all of std::string constructors
+//
+//  // Alias string::copy to Arduinos toCharArray
+//  void toCharArray(char *buf, size_t bufsize, size_t index = 0) const {
+//    copy(buf, bufsize, index);
+//  }
+//};
 #else
 #error "Unkown operating system"
 #endif
@@ -173,7 +173,7 @@ char DefaultFontTableLookup(const uint8_t ch);
 class OLEDDisplay : public Print  {
 #elif __MBED__
 class OLEDDisplay : public Stream {
-#elif defined IDF_VER
+#elif defined(IDF_VER)
 class OLEDDisplay {
 #else
 #error "Unkown operating system"
@@ -254,21 +254,32 @@ class OLEDDisplay {
     void drawIco16x16(int16_t x, int16_t y, const char *ico, bool inverse = false);
 
     /* Text functions */
-
     // Draws a string at the given location
+#if defined(ARDUINO) || defined(__MBED__)
     void drawString(int16_t x, int16_t y, String text);
+#else
+    void drawString(int16_t x, int16_t y, std::string strUser);
+#endif
 
     // Draws a String with a maximum width at the given location.
     // If the given String is wider than the specified width
     // The text will be wrapped to the next line at a space or dash
+#if defined(ARDUINO) || defined(__MBED__)
     void drawStringMaxWidth(int16_t x, int16_t y, uint16_t maxLineWidth, String text);
+#else
+    void drawStringMaxWidth(int16_t x, int16_t y, uint16_t maxLineWidth, std::string text);
+#endif
 
     // Returns the width of the const char* with the current
     // font settings
     uint16_t getStringWidth(const char* text, uint16_t length);
 
     // Convencience method for the const char version
+#if defined(ARDUINO) || defined(__MBED__)
     uint16_t getStringWidth(String text);
+#else
+    uint16_t getStringWidth(std::string text);
+#endif
 
     // Specifies relative to which anchor point
     // the text is rendered. Available constants:

@@ -519,12 +519,16 @@ void OLEDDisplay::drawStringInternal(int16_t xMove, int16_t yMove, char* text, u
   }
 }
 
-
+#if defined(ARDUINO) || defined(__MBED__)
 void OLEDDisplay::drawString(int16_t xMove, int16_t yMove, String strUser) {
-  uint16_t lineHeight = pgm_read_byte(fontData + HEIGHT_POS);
-
   // char* text must be freed!
   char* text = utf8ascii(strUser);
+#else
+void OLEDDisplay::drawString(int16_t xMove, int16_t yMove, std::string strUser) {
+  char text[strUser.length() + 1];
+  strcpy(text, strUser.c_str());
+#endif
+  uint16_t lineHeight = pgm_read_byte(fontData + HEIGHT_POS);
 
   uint16_t yOffset = 0;
   // If the string should be centered vertically too
@@ -546,14 +550,22 @@ void OLEDDisplay::drawString(int16_t xMove, int16_t yMove, String strUser) {
     drawStringInternal(xMove, yMove - yOffset + (line++) * lineHeight, textPart, length, getStringWidth(textPart, length));
     textPart = strtok(NULL, "\n");
   }
+#if defined(ARDUINO) || defined(__MBED__)
   free(text);
+#endif
 }
 
+#if defined(ARDUINO) || defined(__MBED__)
 void OLEDDisplay::drawStringMaxWidth(int16_t xMove, int16_t yMove, uint16_t maxLineWidth, String strUser) {
+  char* text = utf8ascii(strUser);
+#else
+  void OLEDDisplay::drawStringMaxWidth(int16_t xMove, int16_t yMove, uint16_t maxLineWidth, std::string strUser) {
+    char text[strUser.length() + 1];
+    strcpy(text, strUser.c_str());
+#endif
+  
   uint16_t firstChar  = pgm_read_byte(fontData + FIRST_CHAR_POS);
   uint16_t lineHeight = pgm_read_byte(fontData + HEIGHT_POS);
-
-  char* text = utf8ascii(strUser);
 
   uint16_t length = strlen(text);
   uint16_t lastDrawnPos = 0;
@@ -591,8 +603,9 @@ void OLEDDisplay::drawStringMaxWidth(int16_t xMove, int16_t yMove, uint16_t maxL
   if (lastDrawnPos < length) {
     drawStringInternal(xMove, yMove + lineNumber * lineHeight , &text[lastDrawnPos], length - lastDrawnPos, getStringWidth(&text[lastDrawnPos], length - lastDrawnPos));
   }
-
+#if defined(ARDUINO) || defined(__MBED__)
   free(text);
+#endif
 }
 
 uint16_t OLEDDisplay::getStringWidth(const char* text, uint16_t length) {
@@ -611,7 +624,7 @@ uint16_t OLEDDisplay::getStringWidth(const char* text, uint16_t length) {
 
   return max(maxWidth, stringWidth);
 }
-
+#if defined(ARDUINO) || defined(__MBED__)
 uint16_t OLEDDisplay::getStringWidth(String strUser) {
   char* text = utf8ascii(strUser);
   uint16_t length = strlen(text);
@@ -619,6 +632,11 @@ uint16_t OLEDDisplay::getStringWidth(String strUser) {
   free(text);
   return width;
 }
+#else
+uint16_t OLEDDisplay::getStringWidth(std::string strUser) {
+  return getStringWidth(strUser.c_str(), strUser.length() + 1);
+}
+#endif
 
 void OLEDDisplay::setTextAlignment(OLEDDISPLAY_TEXT_ALIGNMENT textAlignment) {
   this->textAlignment = textAlignment;
