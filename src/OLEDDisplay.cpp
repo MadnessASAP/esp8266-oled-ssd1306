@@ -984,6 +984,7 @@ void inline OLEDDisplay::drawInternal(int16_t xMove, int16_t yMove, int16_t widt
   }
 }
 
+#if defined(ARDUINO) || defined(__MBED__)
 // You need to free the char!
 char* OLEDDisplay::utf8ascii(String str) {
   uint16_t k = 0;
@@ -1011,6 +1012,7 @@ char* OLEDDisplay::utf8ascii(String str) {
   // This will leak 's' be sure to free it in the calling function.
   return s;
 }
+#endif
 
 void OLEDDisplay::setFontTableLookupFunction(FontTableLookupFunction function) {
   this->fontTableLookupFunction = function;

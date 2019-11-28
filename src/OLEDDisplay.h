@@ -398,7 +398,9 @@ class OLEDDisplay {
     void sendInitCommands();
 
     // converts utf8 characters to extended ascii
+    #if defined(ARDUINO) || defined(__MBED__)
     char* utf8ascii(String s);
+    #endif
 
     void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const uint8_t *data, uint16_t offset, uint16_t bytesInData) __attribute__((always_inline));
 
