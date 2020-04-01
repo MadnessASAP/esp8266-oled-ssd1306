@@ -634,7 +634,7 @@ uint16_t OLEDDisplay::getStringWidth(String strUser) {
 }
 #else
 uint16_t OLEDDisplay::getStringWidth(std::string strUser) {
-  return getStringWidth(strUser.c_str(), strUser.length() + 1);
+  return getStringWidth(strUser.c_str(), strUser.length());
 }
 #endif
 
